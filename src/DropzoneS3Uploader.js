@@ -97,19 +97,19 @@ export default class DropzoneS3Uploader extends React.Component {
     this.setState({filename, filenames, error: null, progress: null}, () => this.props.onFinish && this.props.onFinish(info))
   }
 
-  handleModify = (files, rejectedFiles) => {
+  handleDrop = (files, rejectedFiles) => {
     // only support single image modifying
     if (this.props.onModify && !this.props.multiple) {
       this.props.onModify(files, rejectedFiles, (modifiedFiles, rejectedFiles) => {
-        if (modifiedFiles) this.handleDrop(modifiedFiles, rejectedFiles)
+        if (modifiedFiles) this.handleUpload(modifiedFiles, rejectedFiles)
       })
     }
     else {
-      this.handleDrop(files, rejectedFiles)
+      this.handleUpload(files, rejectedFiles)
     }
   }
 
-  handleDrop = (files, rejectedFiles) => {
+  handleUpload = (files, rejectedFiles) => {
     this.setState({filenames: [], filename: null, error: null, progress: null})
 
     new S3Upload({ // eslint-disable-line
@@ -169,7 +169,7 @@ export default class DropzoneS3Uploader extends React.Component {
     }
 
     return (
-      <Dropzone onDrop={this.handleModify} {...dropzoneProps} >
+      <Dropzone onDrop={this.handleDrop} {...dropzoneProps} >
         {contents}
         {progress && ProgressComponent ? (<ProgressComponent progress={progress} />) : null}
         {error ? (<small>{error}</small>) : null}
