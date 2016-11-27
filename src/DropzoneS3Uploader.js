@@ -101,7 +101,7 @@ export default class DropzoneS3Uploader extends React.Component {
     // only support single image modifying
     if (this.props.onModify && !this.props.multiple) {
       this.props.onModify(files, rejectedFiles, (modifiedFiles, rejectedFiles) => {
-        if (modifiedFiles) this.handleUpload(modifiedFiles, rejectedFiles)
+        this.handleUpload(modifiedFiles, rejectedFiles)
       })
     }
     else {
