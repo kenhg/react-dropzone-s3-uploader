@@ -26,6 +26,7 @@ export default class DropzoneS3Uploader extends React.Component {
     onError: PropTypes.func,
     onProgress: PropTypes.func,
     onFinish: PropTypes.func,
+    onModify: PropTypes.func,
     isImage: PropTypes.func,
 
     children: PropTypes.element,
@@ -96,6 +97,18 @@ export default class DropzoneS3Uploader extends React.Component {
     this.setState({filename, filenames, error: null, progress: null}, () => this.props.onFinish && this.props.onFinish(info))
   }
 
+  handleModify = (files, rejectedFiles) => {
+    // only support single image modifying
+    if (this.props.onModify && !this.props.multiple) {
+      this.props.onModify(files, rejectedFiles, (modifiedFiles, rejectedFiles) => {
+        if (modifiedFiles) this.handleDrop(modifiedFiles, rejectedFiles)
+      })
+    }
+    else {
+      this.handleDrop(files, rejectedFiles)
+    }
+  }
+
   handleDrop = (files, rejectedFiles) => {
     this.setState({filenames: [], filename: null, error: null, progress: null})
 
@@ -156,7 +169,7 @@ export default class DropzoneS3Uploader extends React.Component {
     }
 
     return (
-      <Dropzone onDrop={this.handleDrop} {...dropzoneProps} >
+      <Dropzone onDrop={this.handleModify} {...dropzoneProps} >
         {contents}
         {progress && ProgressComponent ? (<ProgressComponent progress={progress} />) : null}
         {error ? (<small>{error}</small>) : null}
