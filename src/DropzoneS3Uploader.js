@@ -38,6 +38,9 @@ export default class DropzoneS3Uploader extends React.Component {
     style: PropTypes.object,
     activeStyle: PropTypes.object,
     rejectStyle: PropTypes.object,
+
+    onModify: PropTypes.func,
+    multiple: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -131,6 +134,18 @@ export default class DropzoneS3Uploader extends React.Component {
     this.props.onDrop && this.props.onDrop(files, rejectedFiles)
   }
 
+  onModify = (files, rejectedFiles) => {
+    // only support single image modifying
+    if (this.props.onModify && !this.props.multiple) {
+      this.props.onModify(files, rejectedFiles, (modifiedFiles, rejectedFiles) => {
+        this.handleDrop(modifiedFiles, rejectedFiles)
+      })
+    }
+    else {
+      this.handleDrop(files, rejectedFiles)
+    }
+  }
+
   fileUrl = (s3Url, filename) => `${s3Url.endsWith('/') ? s3Url.slice(0, -1) : s3Url}/${filename}`
 
   renderImage = ({uploadedFile}) => (<div className="rdsu-image"><img src={uploadedFile.fileUrl} /></div>)
@@ -193,7 +208,7 @@ export default class DropzoneS3Uploader extends React.Component {
     }
 
     return (
-      <Dropzone ref={c => this._dropzone = c} onDrop={this.handleDrop} {...dropzoneProps}>
+      <Dropzone ref={c => this._dropzone = c} onDrop={this.onModify} {...dropzoneProps}>
         {content}
       </Dropzone>
     )
